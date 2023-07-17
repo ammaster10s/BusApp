@@ -1,10 +1,14 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { Pressable, Text } from "react-native";
+import { Link } from "expo-router";
 
 const Home = () => {
     return (
-        <View>
-            <Text>Test</Text>
-        </View>
+        <Link href="/other" asChild>
+        <Pressable>
+          <Text>Home</Text>
+        </Pressable>
+      </Link>
     );
 };
 

@@ -1,15 +1,21 @@
-import { View } from 'react-native';
-import { Pressable, Text } from "react-native";
-import { Link } from "expo-router";
+import React from 'react';
+import MapView from 'react-native-maps';
+import { StyleSheet, View } from 'react-native';
 
-const Home = () => {
-    return (
-        <Link href="/other" asChild>
-        <Pressable>
-          <Text>Home</Text>
-        </Pressable>
-      </Link>
-    );
-};
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <MapView style={styles.map} />
+    </View>
+  );
+}
 
-export default Home;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+});

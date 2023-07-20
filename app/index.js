@@ -17,6 +17,16 @@ const MapScreen = () => {
     description: " ",
   };
 
+  const additionalMarkers = [
+    { lat: 14.066916, lng: 100.612880, title: "Start Blue line", description: "" },
+    { lat: 14.067586, lng: 100.610038, title: "", description: "" },
+    { lat: 14.067477, lng: 100.605404, title: "", description: "" },
+    { lat: 14.069038, lng: 100.605457, title: "", description: "" },
+    { lat: 14.069116, lng: 100.604331, title: "", description: "" },
+    { lat: 14.070193, lng: 100.604266, title: "", description: "" },
+    { lat: 14.070328, lng: 100.616118, title: "End Blue line", description: "" },
+  ];
+
   const [mapRegion, setMapRegion] = useState(initialRegion);
 
   const onRegionChange = (region) => {
@@ -31,11 +41,19 @@ const MapScreen = () => {
         initialRegion={initialRegion}
         onRegionChange={onRegionChange}
       >
-        <Marker
+        {/* <Marker
           coordinate={{ latitude: marker1.lat, longitude: marker1.lng }}
           title={marker1.title}
           description={marker1.description}
-        />
+        /> */}
+        {additionalMarkers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={{ latitude: marker.lat, longitude: marker.lng }}
+            title={marker.title}
+            description={marker.description}
+          />
+        ))}
       </MapView>
       {/* Moving Legend */}
       <View
@@ -47,7 +65,7 @@ const MapScreen = () => {
           },
         ]}
       >
-        <Text style={styles.legendText}>Your Moving Legend Here</Text>
+        <Text style={styles.legendText}>Your Current Nearest Bus</Text>
       </View>
     </View>
   );

@@ -10,6 +10,13 @@ const MapScreen = () => {
     longitudeDelta: 0.004, // Zoom level longitude
   };
 
+  const marker1 = {
+    lat: 14.073580191499046,
+    lng: 100.60348190755522,
+    title: "Main Location",
+    description: " ",
+  };
+
   const [mapRegion, setMapRegion] = useState(initialRegion);
 
   const onRegionChange = (region) => {
@@ -24,15 +31,19 @@ const MapScreen = () => {
         initialRegion={initialRegion}
         onRegionChange={onRegionChange}
       >
-        <Marker coordinate={{ latitude: 37.7749, longitude: -122.4194 }} />
+        <Marker
+          coordinate={{ latitude: marker1.lat, longitude: marker1.lng }}
+          title={marker1.title}
+          description={marker1.description}
+        />
       </MapView>
       {/* Moving Legend */}
       <View
         style={[
           styles.legendContainer,
           {
-            top: 20 + (mapRegion.latitudeDelta * 200), // Adjust the position based on zoom level
-            left: 20 + (mapRegion.longitudeDelta * 200), // Adjust the position based on zoom level
+            top: 20 + mapRegion.latitudeDelta * 200, // Adjust the position based on zoom level
+            left: 20 + mapRegion.longitudeDelta * 200, // Adjust the position based on zoom level
           },
         ]}
       >
@@ -51,10 +62,11 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     position: 'absolute',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 10,
+    backgroundColor: 'white',
     padding: 10,
-    elevation: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   legendText: {
     fontSize: 16,

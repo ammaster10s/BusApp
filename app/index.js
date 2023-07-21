@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 
 const MapScreen = () => {
   const initialRegion = {
@@ -10,22 +10,22 @@ const MapScreen = () => {
     longitudeDelta: 0.004, // Zoom level longitude
   };
 
-  const marker1 = {
-    lat: 14.073580191499046,
-    lng: 100.60348190755522,
-    title: "Main Location",
-    description: " ",
-  };
-
   const additionalMarkers = [
-    { lat: 14.066916, lng: 100.612880, title: "Start Blue line", description: "" },
-    { lat: 14.067586, lng: 100.610038, title: "", description: "" },
+    { lat: 14.066813, lng: 100.612880, title: "Start Blue line", description: "" },
+    { lat: 14.066883, lng: 100.609998, title: "", description: "" },
+    { lat: 14.066946, lng: 100.609914, title: "", description: "" },
+    { lat: 14.067411, lng: 100.609935, title: "", description: "" },
     { lat: 14.067477, lng: 100.605404, title: "", description: "" },
     { lat: 14.069038, lng: 100.605457, title: "", description: "" },
     { lat: 14.069116, lng: 100.604331, title: "", description: "" },
     { lat: 14.070193, lng: 100.604266, title: "", description: "" },
     { lat: 14.070328, lng: 100.616118, title: "End Blue line", description: "" },
   ];
+
+  const routeCoordinates = additionalMarkers.map((marker) => ({
+    latitude: marker.lat,
+    longitude: marker.lng,
+  }));
 
   const [mapRegion, setMapRegion] = useState(initialRegion);
 
@@ -41,11 +41,6 @@ const MapScreen = () => {
         initialRegion={initialRegion}
         onRegionChange={onRegionChange}
       >
-        {/* <Marker
-          coordinate={{ latitude: marker1.lat, longitude: marker1.lng }}
-          title={marker1.title}
-          description={marker1.description}
-        /> */}
         {additionalMarkers.map((marker, index) => (
           <Marker
             key={index}
@@ -54,19 +49,14 @@ const MapScreen = () => {
             description={marker.description}
           />
         ))}
+        <Polyline
+          coordinates={routeCoordinates}
+          strokeColor="blue"
+          strokeWidth={4}
+        />
       </MapView>
       {/* Moving Legend */}
-      <View
-        style={[
-          styles.legendContainer,
-          {
-            top: 20 + mapRegion.latitudeDelta * 200, // Adjust the position based on zoom level
-            left: 20 + mapRegion.longitudeDelta * 200, // Adjust the position based on zoom level
-          },
-        ]}
-      >
-        <Text style={styles.legendText}>Your Current Nearest Bus</Text>
-      </View>
+      {/* ... (your existing legend code) */}
     </View>
   );
 };

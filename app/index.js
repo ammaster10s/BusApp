@@ -20,6 +20,33 @@ const MapScreen = () => {
     longitudeDelta: 0.004,
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  const getCurrentLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        console.log('Location permission not granted');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      setUserLocation({ latitude, longitude });
+      setIsLoading(false); // Set isLoading to false once the location is received.
+    } catch (error) {
+      console.log('Error getting location:', error.message);
+      setIsLoading(false); // In case of an error, set isLoading to false.
+    }
+  };
+
   // Additional markers for the bus route
   const additionalMarkers = [
     { lat: 14.066813, lng: 100.612880, title: "Start Blue line", description: "" },
@@ -39,31 +66,38 @@ const MapScreen = () => {
     longitude: marker.lng,
   }));
 
-  // State for loading status
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate 5-second loading delay
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-
-    // Clear the timer when the component unmounts
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Render loading screen for 5 seconds
+  // Render loading screen while fetching user's location
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-  // Render map once loading is completed
+  // Render map once loading is completed and user's location is available
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        region={initialRegion}
+        region={
+          userLocation
+            ? {
+                latitude: userLocation.latitude,
+                longitude: userLocation.longitude,
+                latitudeDelta: 0.004,
+                longitudeDelta: 0.004,
+              }
+            : initialRegion
+        }
       >
+        {userLocation && (
+          <Marker
+            coordinate={{
+              latitude: userLocation.latitude,
+              longitude: userLocation.longitude,
+            }}
+            title="Your Location"
+            description="You are here!"
+          />
+        )}
+
         {/* Additional markers for bus route */}
         {additionalMarkers.map((marker, index) => (
           <Marker

@@ -20,7 +20,36 @@ const MapScreen = () => {
     longitudeDelta: 0.004,
   };
 
+  // Additional markers for the bus route
+  const additionalMarkers = [
+    { lat: 14.066813, lng: 100.612880, title: "Start Blue line", description: "" },
+    { lat: 14.066883, lng: 100.609998, title: "", description: "" },
+    { lat: 14.066946, lng: 100.609914, title: "", description: "" },
+    { lat: 14.067411, lng: 100.609935, title: "", description: "" },
+    { lat: 14.067477, lng: 100.605404, title: "", description: "" },
+    { lat: 14.069038, lng: 100.605457, title: "", description: "" },
+    { lat: 14.069116, lng: 100.604331, title: "", description: "" },
+    { lat: 14.070193, lng: 100.604266, title: "", description: "" },
+    { lat: 14.070328, lng: 100.616118, title: "End Blue line", description: "" },];
+
+  // Convert additional markers to route coordinates
+  const routeCoordinates = additionalMarkers.map((marker) => ({
+    latitude: marker.lat,
+    longitude: marker.lng,
+  }));
+
+  // Initialize the bus position with the starting marker
+  const initialBusPosition = {
+    latitude: additionalMarkers[0].lat,
+    longitude: additionalMarkers[0].lng,
+  };
+
+  // State to store the current bus position
+  const [busPosition, setBusPosition] = useState(initialBusPosition);
+
+  // State for loading status
   const [isLoading, setIsLoading] = useState(true);
+
   const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
@@ -33,6 +62,7 @@ const MapScreen = () => {
 
       if (status !== 'granted') {
         console.log('Location permission not granted');
+        setIsLoading(false); // Set isLoading to false in case of an error
         return;
       }
 
@@ -40,31 +70,33 @@ const MapScreen = () => {
       const { latitude, longitude } = location.coords;
 
       setUserLocation({ latitude, longitude });
-      setIsLoading(false); // Set isLoading to false once the location is received.
+      setIsLoading(false);
     } catch (error) {
       console.log('Error getting location:', error.message);
-      setIsLoading(false); // In case of an error, set isLoading to false.
+      setIsLoading(false); // Set isLoading to false in case of an error
     }
   };
 
-  // Additional markers for the bus route
-  const additionalMarkers = [
-    { lat: 14.066813, lng: 100.612880, title: "Start Blue line", description: "" },
-    { lat: 14.066883, lng: 100.609998, title: "", description: "" },
-    { lat: 14.066946, lng: 100.609914, title: "", description: "" },
-    { lat: 14.067411, lng: 100.609935, title: "", description: "" },
-    { lat: 14.067477, lng: 100.605404, title: "", description: "" },
-    { lat: 14.069038, lng: 100.605457, title: "", description: "" },
-    { lat: 14.069116, lng: 100.604331, title: "", description: "" },
-    { lat: 14.070193, lng: 100.604266, title: "", description: "" },
-    { lat: 14.070328, lng: 100.616118, title: "End Blue line", description: "" },
-  ];
 
-  // Convert additional markers to route coordinates
-  const routeCoordinates = additionalMarkers.map((marker) => ({
-    latitude: marker.lat,
-    longitude: marker.lng,
-  }));
+  // Function to update the bus position
+  const updateBusPosition = () => {
+    const nextMarkerIndex = (routeCoordinates.findIndex(
+      (coord) => coord.latitude === busPosition.latitude && coord.longitude === busPosition.longitude
+    ) + 1) % routeCoordinates.length;
+
+    setBusPosition(routeCoordinates[nextMarkerIndex]);
+  };
+
+  // Interval time in milliseconds to update bus position (adjust as per your preference)
+  const intervalTime = 3000; // 3 seconds
+
+  useEffect(() => {
+    // Start the interval to update the bus position
+    const interval = setInterval(updateBusPosition, intervalTime);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, [busPosition]); // Dependency array includes busPosition to trigger the effect whenever the position changes
 
   // Render loading screen while fetching user's location
   if (isLoading) {
@@ -107,6 +139,19 @@ const MapScreen = () => {
             description={marker.description}
           />
         ))}
+
+        {/* Movable marker representing the bus */}
+        {busPosition && (
+          <Marker
+            coordinate={{
+              latitude: busPosition.latitude,
+              longitude: busPosition.longitude,
+            }}
+            title="Bus"
+            description="The bus is here!"
+            pinColor="green" // Customize the marker color if needed
+          />
+        )}
 
         {/* Polyline for bus route */}
         <Polyline
